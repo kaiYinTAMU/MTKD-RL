@@ -256,6 +256,7 @@ def train(train_loader, model, criterion_list, optimizer, epoch, device,
         
         loss_kd = torch.tensor(0.).cuda(args.gpu)
         for idx in range(len(teacher_models)):
+            ### 这里本质上就是，每个teacher和student都会得到一个KL， feature KD loss，然后都乘以权重，再求均值（其实就是加权和），作为最后的loss
             loss_kd = loss_kd + (logits_actions[:, idx] * criterion_div(logits, teacher_logits[idx].detach(), unreduce=True)).mean()
         loss_feat = torch.tensor(0.).cuda(args.gpu)
         
