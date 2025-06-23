@@ -272,6 +272,7 @@ def train(train_loader, model, criterion_list, optimizer, epoch, device,
         loss = loss_cls + loss_kd + loss_feat
         loss.backward()
         optimizer.step()
+        ### 到上面都是用于train student model的。其中，核心是通过logits_actions, feature_actions = agent(agent_state)来得到weight
 
         
         sample_ce_loss = F.cross_entropy(logits, targets, reduction='none')
