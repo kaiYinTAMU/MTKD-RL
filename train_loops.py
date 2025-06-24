@@ -239,6 +239,12 @@ def train(train_loader, model, criterion_list, optimizer, epoch, device,
         with torch.no_grad():
             logits_actions, feature_actions = agent(agent_state)
         if epoch == 0:
+            ## 其实这里就是policy agent的pre-train
+            ## 上面得到state vector只和teacher model以及student model有关，而student model已经经过了pre-train【自己的工作中可以是from scratch的（from scratch的好处就是可以不受限于base model的size或者性能？）】
+            ## 【先in-batch neg，然后再用teacher model distill下，到一个比较好的performance】【或者就用目前已经有的ckpt】
+            ## 然后这里的action会影响到下面reward的计算【这里的action是每个teacher的weight都采用1】，进而影响到对policy agent的训练
+            ## 这个相当于是一个初始的状态。也就是在第一步的时候，不会直接通过随机初始化的policy NN来得到action（weight dis），而是用最naive的方式，每个teacher相同的weight，
+            ## 对policy NN训练到一个比较好的起点，再进行之后的训练。
             logits_actions = torch.ones_like(logits_actions).cuda(args.gpu)
             feature_actions = torch.ones_like(feature_actions).cuda(args.gpu)
         logits_actions = logits_actions.detach() # batch_size x teacher_number
