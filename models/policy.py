@@ -57,6 +57,8 @@ class PolicyTrans(nn.Module):
         logit_weights = self.softmax(self.logit_head(out1))
         feature_weights = self.softmax(self.feature_head(out1))
 
+        ## 这里就是A.1 Methodology中提到的加上了confidence-and divergence-aware weight generation strategies。
+        ## 对于这3个weight，可以直接取平均，也可以训练一个权重系数
         if self.dynamic:
             l_f = F.softmax(self.logit_weight_factor, dim=0)
             f_f = F.softmax(self.feature_weight_factor, dim=0)
