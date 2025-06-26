@@ -299,6 +299,7 @@ def train(train_loader, model, criterion_list, optimizer, epoch, device,
         normalized_reward = (reward - rewards_mean) / rewards_std 
         normalized_reward = normalized_reward.detach()
         normalized_reward = torch.clamp(normalized_reward, min=0, max=1)
+        ## 为什么reward要normalize？
         #print('normalized_reward', normalized_reward)
         agent_rewards.append(normalized_reward)
         
