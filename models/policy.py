@@ -55,7 +55,7 @@ class PolicyTrans(nn.Module):
         ## teacher_infos的形状是（假设3个teacher），[[B, D_info],[B, D_info], [B, D_info]]
         ## cat后，all_teacher_infos的形状就是[B, D_info*3]，
         ## 也就是3个teacher的stateconcatenate起来输入进policy network中，两个head，第一个得到每个teacher的logit weight, 第二个得到每个teacher的feature weight 
-        ##【如果没用feature weight这个行不行？？】
+        ##【如果没用feature weight这个行不行？？】【主要是reward那边会不会出问题】
         all_teacher_infos = torch.cat(teacher_infos, dim=1)
         out1 = self.steam(all_teacher_infos)
         logit_weights = self.softmax(self.logit_head(out1))
