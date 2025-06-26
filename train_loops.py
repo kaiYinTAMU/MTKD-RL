@@ -65,7 +65,9 @@ def get_agent_state(trans_student_features, teacher_embeddings, logits, teacher_
         t_s_logit_div.append(logit_kl)
         teachers_ce = F.cross_entropy(teacher_logits[idx], targets, reduction='none').unsqueeze(-1)
         t_ces.append(teachers_ce)
+        ## teacher_info就是 [B, D_info]的维度，其中D_info就是把这state涉及到的5个向量按列组合成一个行向量
         teacher_info = torch.cat([feat_cos_sim, logit_kl, teachers_ce, teacher_embeddings[idx], teacher_logits[idx]], dim=1).detach()
+        ## 然后N个teacher的话，就得了这样：[[B, D_info],[B, D_info],..[B, D_info]]
         teacher_infos.append(teacher_info)
     t_ces = torch.cat(t_ces, dim=1).detach()
     t_s_logit_div = torch.cat(t_s_logit_div, dim=1).detach()
