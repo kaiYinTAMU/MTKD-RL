@@ -122,6 +122,7 @@ def train_avg(train_loader, model, criterion_list, optimizer, epoch, device,
         
         loss_kd = torch.tensor(0.).cuda(args.gpu)
         for idx in range(len(teacher_models)):
+            ## 每个teacher也是有一个kl div loss，然后算loss的均值
             loss_kd = loss_kd + criterion_div(logits, teacher_logits[idx].detach())
         loss_kd = loss_kd / len(teacher_models)
         loss_feat = torch.tensor(0.).cuda(args.gpu)
@@ -132,6 +133,7 @@ def train_avg(train_loader, model, criterion_list, optimizer, epoch, device,
             feat_kd_func = FeatureKLLoss(args.kd_T)
 
         for idx in range(len(teacher_models)):
+            ## 就是常规的，每个teacher有1个feature level的kd loss，然后多个teacher的kd loss取平均 【可以先试下这个方案，这个也可以作为start point来尝试】
             loss_feat = loss_feat +  (feat_kd_func(trans_student_features[idx], teacher_features[idx])).mean()
         loss_feat = loss_feat / len(teacher_models)
         loss_feat = args.feat_weight * loss_feat
@@ -263,6 +265,7 @@ def train(train_loader, model, criterion_list, optimizer, epoch, device,
         loss_kd = torch.tensor(0.).cuda(args.gpu)
         for idx in range(len(teacher_models)):
             ### 这里本质上就是，每个teacher和student都会得到一个KL， feature KD loss，然后都乘以权重，再求均值（其实就是加权和），作为最后的loss
+            #### 这里，相比上面的avg的情况，就是给不同teacher的kd loss不同weight了，然后对weight求加权和
             loss_kd = loss_kd + (logits_actions[:, idx] * criterion_div(logits, teacher_logits[idx].detach(), unreduce=True)).mean()
         loss_feat = torch.tensor(0.).cuda(args.gpu)
         
